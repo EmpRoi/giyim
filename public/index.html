@@ -1,0 +1,415 @@
+﻿<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DenimHouse | Ana Sayfa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-left"></div>
+  <div class="ambient ambient-right"></div>
+
+  <header class="site-header reveal">
+    <div class="brand-wrap">
+      <p class="season">YENI SEZON 2026</p>
+      <h1 class="brand-title">DENIMHOUSE</h1>
+      <p class="brand-copy">Turkiye genelinde hizli teslimat ve guvenli online satis deneyimi.</p>
+    </div>
+
+    <div class="header-right">
+      <nav class="main-nav" aria-label="Ana menu">
+        <a class="nav-link active" href="index.html">Ana Sayfa</a>
+        <a class="nav-link" href="products.html">Urunler</a>
+        <a class="nav-link" href="about.html">Hakkinda</a>
+        <a class="nav-link" href="contact.html">Iletisim</a>
+        <a class="nav-link" href="account.html">Uyelik</a>
+      </nav>
+
+      <button id="cartToggle" class="cart-toggle" type="button">
+        Sepet
+        <span id="cartCount" class="cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="hero reveal">
+      <div class="hero-content">
+        <h2>DenimHouse Koleksiyonu</h2>
+        <p>Yeni sezon denim koleksiyonlari, uygun fiyatlar ve kapida odeme secenegiyle sizleri bekliyor.</p>
+      </div>
+      <div class="hero-badges">
+        <span>Ayni Gun Kargo</span>
+        <span>1500 TL Uzeri Ucretsiz Teslimat</span>
+        <span>Kapida Odeme</span>
+      </div>
+    </section>
+
+    <section class="product-section reveal">
+      <div class="section-head">
+        <h3>One Cikan Urunler</h3>
+        <p id="productMeta">En begenilen urunler</p>
+      </div>
+      <div id="productGrid" class="product-grid"></div>
+    </section>
+
+    <section class="panel-grid reveal">
+      <article class="panel-card">
+        <h3>Urunler Paneli</h3>
+        <p>Tum urunleri filtreleyin, sepete ekleyin ve satin alin.</p>
+        <a class="panel-link" href="products.html">Urunlere Git</a>
+      </article>
+
+      <article class="panel-card">
+        <h3>Hakkinda Paneli</h3>
+        <p>Marka hikayesi, hedefler ve hizmet yaklasimi.</p>
+        <a class="panel-link" href="about.html">Hakkinda Sayfasi</a>
+      </article>
+
+      <article class="panel-card">
+        <h3>Iletisim Paneli</h3>
+        <p>Destek iletisimi, telefon ve e-posta bilgileri.</p>
+        <a class="panel-link" href="contact.html">Iletisim Sayfasi</a>
+      </article>
+
+      <article class="panel-card">
+        <h3>Uyelik ve Takip</h3>
+        <p>Uyelik olusturun, siparis gecmisinizi gorun ve takip edin.</p>
+        <a class="panel-link" href="account.html">Uyelik Paneli</a>
+      </article>
+    </section>
+  </main>
+
+  <aside id="cartDrawer" class="cart-drawer" aria-hidden="true">
+    <div class="cart-header">
+      <h4>Sepetim</h4>
+      <button id="closeCart" type="button">Kapat</button>
+    </div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-summary">
+      <p><span>Ara Toplam</span><strong id="subtotalValue">0 TL</strong></p>
+      <p><span>Kargo</span><strong id="shippingValue">0 TL</strong></p>
+      <p class="total-line"><span>Genel Toplam</span><strong id="totalValue">0 TL</strong></p>
+      <button id="proceedPayment" class="checkout-button proceed-payment" type="button">Odeme Yap</button>
+    </div>
+  </aside>
+
+  <div id="overlay" class="overlay hidden"></div>
+
+  <footer class="site-footer reveal">
+    <div class="newsletter-section">
+      <h3>Bultenimize Katilin</h3>
+      <p>En son koleksiyonlar ve ozel firsatlar icin kayit olun.</p>
+      <form id="newsletterForm" class="newsletter-form">
+        <input type="email" name="email" placeholder="E-posta adresiniz" required />
+        <button type="submit" class="checkout-button">Kayit Ol</button>
+      </form>
+      <p id="newsletterMessage" class="newsletter-message"></p>
+    </div>
+    <div class="footer-bottom">
+      <p class="copyright">© 2026 Anatolia Wear. Tum haklari saklidir.</p>
+      <div class="social-links">
+        <a href="#" aria-label="Instagram">Instagram</a>
+        <a href="#" aria-label="Facebook">Facebook</a>
+        <a href="#" aria-label="Twitter">Twitter</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const formatTRY = new Intl.NumberFormat("tr-TR", {
+      style: "currency",
+      currency: "TRY",
+      maximumFractionDigits: 0
+    });
+
+    const SHIPPING_LIMIT = 1500;
+    const SHIPPING_FEE = 79;
+    const CART_KEY = "anatolia-cart-v1";
+    const AUTH_KEY = "anatolia-auth-v1";
+    const API_BASE = resolveApiBase();
+
+    const state = {
+      allProducts: [],
+      products: [],
+      cart: loadCart(),
+      authUser: null
+    };
+
+    const productGrid = document.getElementById("productGrid");
+    const cartToggle = document.getElementById("cartToggle");
+    const cartDrawer = document.getElementById("cartDrawer");
+    const closeCart = document.getElementById("closeCart");
+    const overlay = document.getElementById("overlay");
+    const cartItems = document.getElementById("cartItems");
+    const cartCount = document.getElementById("cartCount");
+    const subtotalValue = document.getElementById("subtotalValue");
+    const shippingValue = document.getElementById("shippingValue");
+    const totalValue = document.getElementById("totalValue");
+    const proceedPayment = document.getElementById("proceedPayment");
+    const newsletterForm = document.getElementById("newsletterForm");
+    const newsletterMessage = document.getElementById("newsletterMessage");
+
+    function resolveApiBase() {
+      const host = window.location.hostname;
+      const port = window.location.port;
+      const isLocalhost = host === "localhost" || host === "127.0.0.1";
+      if (isLocalhost && port && port !== "3000") {
+        return "http://localhost:3000";
+      }
+      return "";
+    }
+
+    function apiUrl(path) {
+      return `${API_BASE}${path}`;
+    }
+
+    function loadCart() {
+      try {
+        const saved = localStorage.getItem(CART_KEY);
+        const parsed = saved ? JSON.parse(saved) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCart() {
+      localStorage.setItem(CART_KEY, JSON.stringify(state.cart));
+    }
+
+    function totals() {
+      const subtotal = state.cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+      const shipping = subtotal >= SHIPPING_LIMIT || subtotal === 0 ? 0 : SHIPPING_FEE;
+      return { subtotal, shipping, total: subtotal + shipping };
+    }
+
+    function renderCart() {
+      if (state.cart.length === 0) {
+        cartItems.textContent = "Sepetiniz bos.";
+      } else {
+        cartItems.textContent = "";
+        state.cart.forEach((item) => {
+          const article = document.createElement("article");
+          article.className = "cart-item";
+          article.innerHTML = `
+            <div class="cart-item-top">
+              <div>
+                <h5></h5>
+                <p></p>
+              </div>
+            </div>
+          <div class="qty-row">
+            <button type="button" data-role="qty-minus" data-key="${item.key}">-</button>
+            <strong></strong>
+            <button type="button" data-role="qty-plus" data-key="${item.key}">+</button>
+          </div>
+          <button class="remove-btn" type="button" data-role="remove" data-key="${item.key}">Kaldir</button>
+        `;
+        article.querySelector("h5").textContent = item.name;
+        article.querySelector(".cart-item-top div p").textContent = `Beden: ${item.size}`;
+        article.querySelector(".cart-item-top div strong").textContent = formatTRY.format(item.unitPrice * item.quantity);
+        article.querySelector(".qty-row strong").textContent = item.quantity;
+        cartItems.appendChild(article);
+      });
+      }
+
+      const { subtotal, shipping, total } = totals();
+      cartCount.textContent = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+      subtotalValue.textContent = formatTRY.format(subtotal);
+      shippingValue.textContent = shipping === 0 ? "Ucretsiz" : formatTRY.format(shipping);
+      totalValue.textContent = formatTRY.format(total);
+    }
+
+    function updateQuantity(key, delta) {
+      const index = state.cart.findIndex((item) => item.key === key);
+      if (index < 0) return;
+      const line = state.cart[index];
+      const nextQuantity = line.quantity + delta;
+      if (nextQuantity <= 0) {
+        state.cart.splice(index, 1);
+      } else {
+        line.quantity = nextQuantity;
+      }
+      saveCart();
+      renderCart();
+    }
+
+    function removeLine(key) {
+      state.cart = state.cart.filter((item) => item.key !== key);
+      saveCart();
+      renderCart();
+    }
+
+    function openCart() {
+      cartDrawer.classList.add("open");
+      cartDrawer.setAttribute("aria-hidden", "false");
+      overlay.classList.remove("hidden");
+    }
+
+    function hideCart() {
+      cartDrawer.classList.remove("open");
+      cartDrawer.setAttribute("aria-hidden", "true");
+      overlay.classList.add("hidden");
+    }
+
+    async function fetchProducts() {
+      const response = await fetch(apiUrl("/api/products"));
+      state.allProducts = await response.json();
+      
+      state.products = state.allProducts.filter(p => p.featured).slice(0, 4);
+      renderProducts();
+    }
+
+    function renderProducts() {
+      if (state.products.length === 0) {
+        productGrid.innerHTML = '<p class="empty-state">Urun bulunamadi.</p>';
+        return;
+      }
+
+      productGrid.innerHTML = state.products.map((product) => {
+        const badge = product.new ? '<span class="tag">YENI</span>' : "";
+
+        return `
+          <article class="product-card">
+            <a href="product-detail.html?id=${product.id}">
+              <img src="${product.image}" alt="${product.name}" class="product-image" />
+            </a>
+            <div class="card-body">
+              <div class="card-top">
+                <h4>${product.name}</h4>
+                ${badge}
+              </div>
+              <p class="category">${product.category}</p>
+              <div class="price-row">
+                <span class="current-price">${formatTRY.format(product.price)}</span>
+                ${product.oldPrice > product.price ? `
+                  <span class="old-price">${formatTRY.format(product.oldPrice)}</span>
+                ` : ""}
+              </div>
+              <p class="stock">Stok: ${product.stock}</p>
+              <div class="card-actions">
+                <select data-role="size-select" data-product-id="${product.id}" class="size-select">
+                  ${product.sizes.map(s => `<option value="${s}">${s}</option>`).join("")}
+                </select>
+                <button type="button" class="add-btn" data-role="add-cart" data-product-id="${product.id}">Sepete Ekle</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function addToCart(productId, size) {
+      const product = state.allProducts.find(p => p.id === productId);
+      if (!product) return;
+
+      const key = `${productId}::${size}`;
+      const existing = state.cart.find(item => item.key === key);
+
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        state.cart.push({
+          key,
+          productId,
+          name: product.name,
+          size: size,
+          quantity: 1,
+          unitPrice: product.price
+        });
+      }
+
+      saveCart();
+      renderCart();
+      openCart();
+    }
+
+    function bindEvents() {
+      cartToggle.addEventListener("click", openCart);
+      closeCart.addEventListener("click", hideCart);
+      overlay.addEventListener("click", hideCart);
+
+      productGrid.addEventListener("click", (event) => {
+        const button = event.target.closest('[data-role="add-cart"]');
+        if (!button) return;
+
+        const productId = button.getAttribute("data-product-id");
+        const select = productGrid.querySelector(`[data-role="size-select"][data-product-id="${productId}"]`);
+        const size = select ? select.value : "M";
+
+        addToCart(productId, size);
+      });
+
+      cartItems.addEventListener("click", (event) => {
+        const target = event.target;
+        const key = target.getAttribute("data-key");
+        if (!key) return;
+
+        if (target.matches('[data-role="qty-minus"]')) {
+          updateQuantity(key, -1);
+          return;
+        }
+        if (target.matches('[data-role="qty-plus"]')) {
+          updateQuantity(key, 1);
+          return;
+        }
+        if (target.matches('[data-role="remove"]')) {
+          removeLine(key);
+        }
+      });
+
+      proceedPayment.addEventListener("click", () => {
+        window.location.href = "products.html";
+      });
+
+      // Newsletter form handler
+      newsletterForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(newsletterForm);
+        const email = formData.get("email");
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          newsletterMessage.textContent = "Lutfen gecerli bir e-posta adresi girin.";
+          newsletterMessage.className = "newsletter-message error";
+          return;
+        }
+
+        try {
+          const response = await fetch(apiUrl("/api/newsletter/subscribe"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+          });
+
+          const data = await response.json();
+          
+          if (response.ok) {
+            newsletterMessage.textContent = data.message || "Basariyla kayit oldunuz!";
+            newsletterMessage.className = "newsletter-message success";
+            newsletterForm.reset();
+          } else {
+            newsletterMessage.textContent = data.message || "Kayit sirasinda bir hata olustu.";
+            newsletterMessage.className = "newsletter-message error";
+          }
+        } catch (error) {
+          newsletterMessage.textContent = "Bir hata olustu. Lutfen tekrar deneyin.";
+          newsletterMessage.className = "newsletter-message error";
+        }
+      });
+    }
+
+    async function init() {
+      bindEvents();
+      renderCart();
+      await fetchProducts();
+    }
+
+    init();
+  </script>
+</body>
+</html>

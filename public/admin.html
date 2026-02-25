@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DenimHouse | Yönetici Paneli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-left"></div>
+  <div class="ambient ambient-right"></div>
+
+  <header class="site-header reveal">
+    <div class="brand-wrap">
+      <p class="season">YONETICI PANELI</p>
+      <h1 class="brand-title">ADMIN</h1>
+      <p class="brand-copy">DenimHouse urunlerini yonetip satin alin.</p>
+    </div>
+    <nav class="main-nav" aria-label="Ana menu">
+      <a class="nav-link" href="index.html">Ana Sayfa</a>
+      <a class="nav-link" href="products.html">Urunler</a>
+      <a class="nav-link active" href="admin.html">Admin</a>
+      <a class="nav-link" href="about.html">Hakkinda</a>
+      <a class="nav-link" href="contact.html">Iletisim</a>
+      <a class="nav-link" href="account.html">Uyelik</a>
+    </nav>
+  </header>
+
+  <main class="page-main">
+    <section class="info-card reveal" id="authSection">
+      <h3>Admin Giris</h3>
+      <p>Urün yönetimi için giriş yapin.</p>
+      <form id="loginForm" class="auth-form">
+        <label>
+          <span>E-posta</span>
+          <input name="email" type="email" required />
+        </label>
+        <label>
+          <span>Sifre</span>
+          <input name="password" type="password" required />
+        </label>
+        <button type="submit" class="checkout-button">Giris Yap</button>
+      </form>
+      <p id="loginMessage" class="order-result"></p>
+    </section>
+
+<section class="info-card reveal" id="managementSection" style="display:none;">
+      <div class="admin-tabs">
+        <button type="button" class="tab-btn active" data-tab="products">Urunler</button>
+        <button type="button" class="tab-btn" data-tab="orders">Siparisler</button>
+        <button type="button" class="tab-btn" data-tab="admins">Yöneticiler</button>
+      </div>
+
+      <!-- Products Tab -->
+      <div id="productsTab" class="tab-content active">
+        <div class="section-head">
+          <h3>Urun Yonetimi</h3>
+          <div>
+            <button type="button" class="secondary-btn" id="changePasswordBtn">Sifre Degistir</button>
+            <button type="button" class="secondary-btn" id="logoutBtn">Cikis Yap</button>
+          </div>
+        </div>
+
+        <!-- Password Change Modal -->
+        <div id="passwordModal" class="modal" style="display:none;">
+          <div class="modal-content">
+            <span class="close-modal" id="closePasswordModal">&times;</span>
+            <h3>Sifre Degistir</h3>
+            <form id="passwordForm" class="auth-form">
+              <label>
+                <span>Mevcut Sifre</span>
+                <input type="password" id="currentPassword" required />
+              </label>
+              <label>
+                <span>Yeni Sifre</span>
+                <input type="password" id="newPassword" required minlength="6" />
+              </label>
+              <label>
+                <span>Yeni Sifre Tekrar</span>
+                <input type="password" id="confirmPassword" required minlength="6" />
+              </label>
+              <button type="submit" class="checkout-button">Sifreyi Guncelle</button>
+            </form>
+            <p id="passwordMessage" class="order-result"></p>
+          </div>
+        </div>
+        
+        <form id="productForm" class="auth-form">
+          <input type="hidden" name="productId" id="productIdInput" />
+
+          <div class="form-row">
+            <label class="wide">
+              <span>Urun Adi</span>
+              <input name="name" type="text" required placeholder="Orn: Mavi Kot Pantolon" />
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label>
+              <span>Kategori</span>
+              <select name="category" required>
+                <option value="">Seciniz</option>
+                <option value="gomlek">Gomlek</option>
+                <option value="pantolon">Pantolon</option>
+                <option value="triko">Triko</option>
+                <option value="ceket">Ceket</option>
+                <option value="sort">Sort</option>
+                <option value="sweat">Sweat</option>
+                <option value="tişort">Tişort</option>
+                <option value="ayakkabı">Ayakkabı</option>
+                <option value="aksesuar">Aksesuar</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Fiyat</span>
+              <input name="price" type="number" min="0" required placeholder="1000" />
+            </label>
+
+            <label>
+              <span>Eski Fiyat</span>
+              <input name="oldPrice" type="number" min="0" placeholder="1200" />
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label>
+              <span>Stok Adedi</span>
+              <input name="stock" type="number" min="0" value="10" />
+            </label>
+
+            <label class="wide">
+              <span>Bedenler (Ctrl ile coklu secin)</span>
+              <select name="sizes" multiple size="4">
+                <option value="XS">XS</option>
+                <option value="S" selected>S</option>
+                <option value="M" selected>M</option>
+                <option value="L" selected>L</option>
+                <option value="XL" selected>XL</option>
+                <option value="XXL">XXL</option>
+                <option value="28">28</option>
+                <option value="30">30</option>
+                <option value="32">32</option>
+                <option value="34">34</option>
+                <option value="36">36</option>
+                <option value="38">38</option>
+                <option value="39">39</option>
+                <option value="40">40</option>
+                <option value="41">41</option>
+                <option value="42">42</option>
+                <option value="43">43</option>
+                <option value="44">44</option>
+                <option value="45">45</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="wide">
+            <span>Resim URL</span>
+            <input name="image" type="url" placeholder="https://images.unsplash.com/..." />
+          </label>
+
+          <label class="wide">
+            <span>Aciklama</span>
+            <textarea name="description" rows="3" placeholder="Urun aciklamasi..."></textarea>
+          </label>
+
+          <div class="form-row">
+            <label class="checkbox-row">
+              <input type="checkbox" name="featured" id="featuredCheck" />
+              <span>One Cikanlar</span>
+            </label>
+
+            <label class="checkbox-row">
+              <input type="checkbox" name="new" id="newCheck" />
+              <span>Yeni Urun</span>
+            </label>
+          </div>
+
+          <div class="button-row">
+            <button type="submit" class="checkout-button" id="saveBtn">Urun Ekle</button>
+            <button type="button" class="secondary-btn" id="cancelBtn" style="display:none;">Iptal</button>
+          </div>
+        </form>
+        <p id="productMessage" class="order-result"></p>
+
+        <div class="section-head list-head">
+          <h3>Mevcut Urunler</h3>
+          <span id="productCount">0 urun</span>
+        </div>
+        <div id="productsList" class="admin-products-grid"></div>
+      </div>
+
+      <!-- Orders Tab -->
+      <div id="ordersTab" class="tab-content">
+        <div class="section-head">
+          <h3>Siparis Yonetimi</h3>
+          <span id="orderCount">0 siparis</span>
+        </div>
+        <div id="ordersList" class="admin-orders-list"></div>
+      </div>
+
+      <!-- Admins Tab -->
+      <div id="adminsTab" class="tab-content">
+        <div class="section-head">
+          <h3>Yonetici Ekle</h3>
+        </div>
+        <form id="adminForm" class="auth-form">
+          <label>
+            <span>Ad Soyad</span>
+            <input name="fullName" type="text" required />
+          </label>
+          <label>
+            <span>E-posta</span>
+            <input name="email" type="email" required />
+          </label>
+          <label>
+            <span>Sifre</span>
+            <input name="password" type="password" required minlength="6" />
+          </label>
+          <button type="submit" class="checkout-button">Admin Ekle</button>
+        </form>
+        <p id="adminMessage" class="order-result"></p>
+
+        <div class="section-head list-head">
+          <h3>Mevcut Yöneticiler</h3>
+          <span id="adminCount">0 yonetici</span>
+        </div>
+        <div id="adminsList" class="admin-users-list"></div>
+      </div>
+    </section>
+
+    <!-- Order Detail Modal -->
+    <div id="orderModal" class="modal" style="display:none;">
+      <div class="modal-content" id="orderModalContent">
+        <!-- Burası JS ile doldurulacak -->
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer reveal">
+    <p class="copyright">© 2026 Anatolia Wear. Tum haklari saklidir.</p>
+  </footer>
+
+  <script src="admin.js" defer></script>
+</body>
+</html>
+
